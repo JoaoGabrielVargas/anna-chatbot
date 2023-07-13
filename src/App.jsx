@@ -1,89 +1,73 @@
 /* eslint-disable react/react-in-jsx-scope */
 
-import React, { useState } from "react";
+import React from "react";
+import ChatBot from "react-simple-chatbot";
 // import { saveAs } from "file-saver"; //
 
 function Chatbot() {
-  const [messages, setMessages] = useState([]);
-  const [newMessage, setNewMessage] = useState("");
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-
-  const handleNewMessage = (text) => {
-    setNewMessage({ text, date: "19-06-2019" });
-  };
-
-  const handleSendMessage = () => {
-    setMessages([...messages, newMessage]);
-    if (newMessage.text === "Goodbye") {
-      // TODO: Store the conversation in the database
-      return;
+  const waitForTrigger = ({previousValue}) => {
+    if (previousValue === "Hello" || previousValue === "hello"){
+      return "Hello! Whats your name?";
     }
 
-    if (!username || !password) {
-      // Ask for username and password if not provided
-      setMessages([
-        ...messages,
-        {
-          text: "Please provide your username and password.",
-          date: "19-06-2019"
-        }
-      ]);
-      setUsername("joão");
-      setPassword("oi");
-      return;
+    if (previousValue === "Good" || previousValue === "good"){
+      return "I'm good too! What you want?";
     }
 
-    if (newMessage.text === "I want a loan") {
-      // Display options for the loan
-      setMessages([
-        ...messages,
-        { text: "Do you want to apply for a loan?", options: ["Yes", "No"] }
-      ]);
+    if (previousValue === "I want" || previousValue === "i want"){
+      return "Very good! What you want?";
     }
 
-    // Handle other terms and respond accordingly
-  };
+    if (previousValue === "Goodbye" || previousValue === "goodbye"){
+      return "Ok! Bye then. =(";
+    }
 
-  // const exportConversation = () => {
-  //   const csvData = messages
-  //    .map((message) => `${message.text} - ${message.date.toLocaleString()}`)
-  //    .join("\n");
-  //  const blob = new Blob([csvData], { type: "text/csv;charset=utf-8;" });
-  //  saveAs(blob, "conversation.csv");
-  //
+    return "I can't understand what you saying."
+  }
+
+  const setTrigger = ({steps}) => {
+    const { message } = steps["wait for trigger"]
+    if (message === "I can't understand what you saying.") {
+      return "wait trigger"
+    }
+    
+    return "next"
+  }
+
+  const steps = [
+    {
+      id: "Greet",
+      message: "Hello! I'm Anna.",
+      trigger: "wait trigger"
+    },
+    { id: "wait trigger", user: true, trigger: "wait for trigger" },
+    { id: "wait for trigger", message: waitForTrigger, trigger: setTrigger },
+    { id: "next", message: "PRóXIMO PASSO CARAI", end: true },
+    // { id: "Ask Name", message: "How is your name?", trigger: "waiting name" },
+    // { id: "waiting name", user: true, trigger: "Name"},
+    // {
+    //   id: "Name",
+    //   message: "Hi {previousValue}, please enter a password. We want privacy :)",
+    //   trigger: "waiting password"
+    // },
+    // { id: "waiting password", user: true, trigger: "anna write issue" },
+    // { id: "anna write issue", message: "Now, tell me what you want.", trigger: "write issue"},
+    // { id: "write issue", user: true, trigger: "next"},
+    // { id: "next", message: "{previousValue}"},
+    // {
+    //   id: "issues",
+    //   options: [
+    //     { value: "React", label: "React", trigger: "React" },
+    //     { value: "Node", label: "Node", trigger: "Node" }
+    //   ]
+    // },
+    // { id: "React", message: "Thanks for telling your react issue", end: true },
+    // { id: "Node", message: "Thanks for telling your node issue", end: true }
+  ];
 
   return (
     <div>
-      <h2>Hi, I'm Anna. I gonna help you. Talk to me!</h2>
-      <input
-        type="text"
-        placeholder="Type your message..."
-        onChange={(e) => handleNewMessage(e.target.value)}
-      />
-      <button type="button" onClick={handleSendMessage}>
-        Enviar
-      </button>
-      <div>
-        {messages.map((message) => (
-          <div key={message.text}>
-            <span>{message.text}</span>
-            <span>{message.date}</span>
-            <div>
-              {message.options &&
-                message.options.map((option) => (
-                  <button
-                    type="button"
-                    onClick={handleSendMessage}
-                    key={option}
-                  >
-                    {option}
-                  </button>
-                ))}
-            </div>
-          </div>
-        ))}
-      </div>
+      <ChatBot steps={steps} headerTitle="Conversar com Anna" speechSynthesis={{ enable: true, lang: 'en' }} recognitionEnable />
     </div>
   );
 }
