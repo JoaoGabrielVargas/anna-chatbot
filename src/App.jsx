@@ -7,35 +7,65 @@ import ChatBot from "react-simple-chatbot";
 function ApplyLoan() {
   return (
   <div> 
-    <a href="https://www.moneysupermarket.com/loans/">Click here for loan options</a> 
+    <a href="https://www.moneysupermarket.com/loans/"
+      target="_blank"
+      rel="noreferrer"
+    >
+      Click here for loan options</a> 
+  </div>
+  )
+}
+
+function LoanConditions() {
+  return (
+  <div> 
+    <a href="https://www.moneysupermarket.com/loans/eligibility-search/" 
+      target="_blank"
+      rel="noreferrer"  
+    >
+      Click here to see loan conditions
+    </a> 
+  </div>
+  )
+}
+
+function HelpComponent() {
+  return (
+  <div> 
+    <a href="https://www.moneysupermarket.com/how-moneysupermarket-works/"
+    target="_blank"
+    rel="noreferrer"   
+    >
+      Click here to get help and understand about the website</a> 
   </div>
   )
 }
 
 function Chatbot() {
   const waitForTrigger = ({previousValue}) => {
-    if (previousValue === "Hello" || previousValue === "hello"){
+    const message = (previousValue || '').toLowerCase();
+    if (message.includes("hello")){
       return "Hello! Whats your name?";
     }
 
-    if (previousValue === "Good" || previousValue === "good"){
+    if (message.includes("good")){
       return "I'm good too! First, tell me your name.";
     }
 
-    if (previousValue === "I want" || previousValue === "i want"){
-      return "Very good! Now, tell me your name.";
+    if (message.includes("i want")){
+      return "Everyone want something! But first, tell me your name.";
     }
 
-    if (previousValue === "Goodbye" || previousValue === "goodbye"){
+    if (message.includes("goodbye")){
       return "Ok! Bye then. =(";
     }
 
-    return "I can't understand what you saying."
+    return "I can't understand what you saying. Tip: I like to start conversations with 'hello', 'good', 'I want' or if you wanna leave, just say 'goodbye'"
   }
 
   const setTrigger = ({steps}) => {
     const { message } = steps["wait for trigger"]
-    if (message === "I can't understand what you saying.") {
+    if (message.includes("I can't understand what you saying.")) {
       return "wait trigger"
     }
     
@@ -43,7 +73,7 @@ function Chatbot() {
   }
 
   const setAnswerTrigger = ({value}) => {
-   const message = (value || '').toLowerCase();;
+   const message = (value || '').toLowerCase();
     if (message.includes("loan")) {
       return "loan trigger"
     }
@@ -61,7 +91,6 @@ function Chatbot() {
     return "unknown answer trigger";
   }
 
- 
   const steps = [
     {
       id: "Greet",
@@ -76,14 +105,14 @@ function Chatbot() {
     // ANNA ASKING STEPS
   
     { id: "set password", user: true, trigger: "anna ask" },
-    { id: "anna ask", message: "And what do you want?", trigger: "user ask" },
+    { id: "anna ask", message: "What you wanna know?", trigger: "user ask" },
 
     // USER ASK
     { id: "user ask", user: true, trigger: setAnswerTrigger },
 
     // UNKNOWN ANSWER
 
-    { id: "unknown answer trigger", message: "I don't know what you're saying, so goodbye.", end: true },
+    { id: "unknown answer trigger", message: "I don't know what you're saying, can you say again?.", trigger: "wait trigger" },
 
      // LOAN ANSWERS
     { id: "loan trigger", 
@@ -105,15 +134,35 @@ function Chatbot() {
           },
         ]
     },
-    {id : "apply loan", component: <ApplyLoan />, end: true},
-    {id : "loan conditions", message: "loan conditions!!!", end: true},
-    {id : "help", message: "somebody help meee please!", end: true},
+    {id : "apply loan", component: <ApplyLoan />, trigger: "anna talk after ask"},
+    {id : "anna talk after ask", message: "You want to say goodbye, ask again or go back to Loan Options?", trigger: "after select option loan" },
+    { id: "after select option loan", 
+        options: [ 
+          { 
+            value: "Ask again", 
+            label: "Ask again",
+            trigger: "anna ask"
+          },
+          { 
+            value: "Go back to Loan Options", 
+            label: "Go back to Loan Options",
+            trigger: "loan trigger"
+          },
+          { 
+            value: "Say goodbye.", 
+            label: "Say goodbye.",
+            trigger: "goodbye trigger"
+          },
+        ]
+    },
+    {id : "loan conditions", component: <LoanConditions />, trigger: "anna talk after ask"},
+    {id : "help", component: <HelpComponent />, trigger: "anna talk after ask"},
 
     // WANT ANSWERS
 
     { id: "want trigger", message: "ráa what do you want now????", end: true },
     { id: "good trigger", message: "goood, very goooooood", end: true },
-    { id: "goodbye trigger", message: "Bye bye then", end: true },
+    { id: "goodbye trigger", message: "Farewell then", end: true },
   ];
 
   return (
