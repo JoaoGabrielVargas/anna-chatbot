@@ -1,12 +1,27 @@
+/* eslint-disable react/jsx-props-no-spreading */
+
 import { useEffect } from "react";
+import { CSVLink } from "react-csv";
+import PropTypes from "prop-types";
 
 function GoodbyeComponent({ steps }) {
   const { setName } = steps;
   const date = new Date();
-  const formattedDate = date.toLocaleString();
+  const formattedDate = date.toLocaleString().replace(",", "");
   const username = setName ? setName.value : "unknown name";
 
   const historic = JSON.parse(localStorage.getItem("historic"));
+
+  const headers = [
+    { label: "Username", key: "username" },
+    { label: "Date", key: "date" },
+  ];
+
+  const csvReport = {
+    data: historic,
+    headers,
+    filename: "historic.csv",
+  };
 
   useEffect(() => {
     const newRegister = {
@@ -23,10 +38,6 @@ function GoodbyeComponent({ steps }) {
     }
   }, []);
 
-  const exportHistoric = () => {
-    console.log(steps);
-  };
-
   return (
     <>
       <p>
@@ -34,7 +45,7 @@ function GoodbyeComponent({ steps }) {
         forever.
       </p>
       <div style={{ width: "100%" }}>
-        <h3>Summary</h3>
+        <h3>Historic</h3>
         <table>
           <thead>
             <tr>
@@ -43,20 +54,31 @@ function GoodbyeComponent({ steps }) {
             </tr>
           </thead>
           <tbody>
-            {historic.map((register) => (
-              <tr key={register.date}>
-                <td>{register.username}</td>
-                <td>{register.date}</td>
-              </tr>
-            ))}
+            {historic &&
+              historic.map((register) => (
+                <tr key={register.date}>
+                  <td>{register.username}</td>
+                  <td>{register.date}</td>
+                </tr>
+              ))}
           </tbody>
         </table>
-        <button type="button" onClick={exportHistoric}>
-          Export in CSV
-        </button>
+        <CSVLink {...csvReport}>Export to CSV</CSVLink>
       </div>
     </>
   );
 }
+
+GoodbyeComponent.defaultProps = {
+  steps: undefined,
+};
+
+GoodbyeComponent.propTypes = {
+  steps: PropTypes.shape({
+    setName: PropTypes.shape({
+      value: PropTypes.string,
+    }),
+  }),
+};
 
 export default GoodbyeComponent;
