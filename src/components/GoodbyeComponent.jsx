@@ -1,29 +1,23 @@
 /* eslint-disable react/jsx-props-no-spreading */
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { CSVLink } from "react-csv";
 import PropTypes from "prop-types";
 
 function GoodbyeComponent({ steps }) {
+  const [historicArray, setHistoricArray] = useState([]);
   const { setName } = steps;
   const date = new Date();
   const formattedDate = date.toLocaleString().replace(",", "");
   const username = setName ? setName.value : "unknown name";
-
-  const historic = JSON.parse(localStorage.getItem("historic"));
 
   const headers = [
     { label: "Username", key: "username" },
     { label: "Date", key: "date" },
   ];
 
-  const csvReport = {
-    data: historic,
-    headers,
-    filename: "historic.csv",
-  };
-
   useEffect(() => {
+    const historic = JSON.parse(localStorage.getItem("historic"));
     const newRegister = {
       username,
       date: formattedDate,
@@ -33,8 +27,12 @@ function GoodbyeComponent({ steps }) {
         "historic",
         JSON.stringify([...historic, newRegister])
       );
+      const updatedHistoric = JSON.parse(localStorage.getItem("historic"));
+      setHistoricArray(updatedHistoric);
     } else {
       localStorage.setItem("historic", JSON.stringify([newRegister]));
+      const updatedHistoric = JSON.parse(localStorage.getItem("historic"));
+      setHistoricArray(updatedHistoric);
     }
   }, []);
 
@@ -54,8 +52,8 @@ function GoodbyeComponent({ steps }) {
             </tr>
           </thead>
           <tbody>
-            {historic &&
-              historic.map((register) => (
+            {historicArray &&
+              historicArray.map((register) => (
                 <tr key={register.date}>
                   <td>{register.username}</td>
                   <td>{register.date}</td>
@@ -63,7 +61,9 @@ function GoodbyeComponent({ steps }) {
               ))}
           </tbody>
         </table>
-        <CSVLink {...csvReport}>Export to CSV</CSVLink>
+        <CSVLink data={historicArray} headers={headers} filename="historic.csv">
+          Export to CSV
+        </CSVLink>
       </div>
     </>
   );
