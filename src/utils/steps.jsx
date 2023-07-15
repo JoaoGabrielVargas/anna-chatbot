@@ -6,18 +6,18 @@ import HelpComponent from "../components/HelpComponent";
 const waitForTrigger = ({ previousValue }) => {
   const message = (previousValue || "").toLowerCase();
   if (message.includes("hello")) {
-    return "Hello! Whats your name?";
+    return "Hello! What is your name?";
   }
   if (message.includes("goodbye")) {
     return "Ok! Bye then. =(";
   }
 
   if (message.includes("good")) {
-    return "I'm good too! First, tell me your name.";
+    return "I am well too! First, tell me your name.";
   }
 
   if (message.includes("i want")) {
-    return "Everyone want something! But first, tell me your name.";
+    return "Everyone wants something! But first, tell me your name.";
   }
 
   return "I can't understand what you saying. Tip: I like to start conversations with 'hello', 'good', 'I want' or if you wanna leave, just say 'goodbye'";
@@ -58,7 +58,7 @@ const steps = [
   { id: "setName", user: true, trigger: "pre set password" },
   {
     id: "pre set password",
-    message: "Beautiful name, {previousValue}. Now, set a password.",
+    message: "Beautiful name, {previousValue}. Now, enter a password.",
     trigger: "set password",
   },
 
@@ -67,7 +67,8 @@ const steps = [
   { id: "set password", user: true, trigger: "anna ask" },
   {
     id: "anna ask",
-    message: "What you wanna know? I can talk about loan",
+    message:
+      "It's great talking to you! What you wanna know? I can talk about loan",
     trigger: "user ask",
   },
 
@@ -79,7 +80,7 @@ const steps = [
   {
     id: "unknown answer trigger",
     message:
-      "I don't know what you're saying, can you say again? Is it about loan?.",
+      "I don't know what you're talking about, can you say it again? Is it about loan?",
     trigger: "anna ask",
   },
 
@@ -111,7 +112,8 @@ const steps = [
   },
   {
     id: "anna talk after ask",
-    message: "You want to say goodbye, ask again or go back to Loan Options?",
+    message:
+      "Do you want to say goodbye, ask again or go back to Loan Options?",
     trigger: "after select option loan",
   },
   {
